@@ -1,61 +1,68 @@
 'use strict';
 
-var test = require('tape');
+var GetIntrinsic = require('get-intrinsic');
+var callBound = require('call-bound');
+var inspect = require('object-inspect');
 
-var callBound = require('../');
+var $TypeError = require('es-errors/type');
+var $Map = GetIntrinsic('%Map%', true);
 
-/** @template {true} T @template U @typedef {T extends U ? T : never} AssertType */
+/** @type {<K, V>(thisArg: Map<K, V>, key: K) => V} */
+var $mapGet = callBound('Map.prototype.get', true);
+/** @type {<K, V>(thisArg: Map<K, V>, key: K, value: V) => void} */
+var $mapSet = callBound('Map.prototype.set', true);
+/** @type {<K, V>(thisArg: Map<K, V>, key: K) => boolean} */
+var $mapHas = callBound('Map.prototype.has', true);
+/** @type {<K, V>(thisArg: Map<K, V>, key: K) => boolean} */
+var $mapDelete = callBound('Map.prototype.delete', true);
+/** @type {<K, V>(thisArg: Map<K, V>) => number} */
+var $mapSize = callBound('Map.prototype.size', true);
 
-test('callBound', function (t) {
-	// static primitive
-	t.equal(callBound('Array.length'), Array.length, 'Array.length yields itself');
-	t.equal(callBound('%Array.length%'), Array.length, '%Array.length% yields itself');
+/** @type {import('.')} */
+module.exports = !!$Map && /** @type {Exclude<import('.'), false>} */ function getSideChannelMap() {
+	/** @typedef {ReturnType<typeof getSideChannelMap>} Channel */
+	/** @typedef {Parameters<Channel['get']>[0]} K */
+	/** @typedef {Parameters<Channel['set']>[1]} V */
 
-	// static non-function object
-	t.equal(callBound('Array.prototype'), Array.prototype, 'Array.prototype yields itself');
-	t.equal(callBound('%Array.prototype%'), Array.prototype, '%Array.prototype% yields itself');
-	t.equal(callBound('Array.constructor'), Array.constructor, 'Array.constructor yields itself');
-	t.equal(callBound('%Array.constructor%'), Array.constructor, '%Array.constructor% yields itself');
+	/** @type {Map<K, V> | undefined} */ var $m;
 
-	// static function
-	t.equal(callBound('Date.parse'), Date.parse, 'Date.parse yields itself');
-	t.equal(callBound('%Date.parse%'), Date.parse, '%Date.parse% yields itself');
+	/** @type {Channel} */
+	var channel = {
+		assert: function (key) {
+			if (!channel.has(key)) {
+				throw new $TypeError('Side channel does not contain ' + inspect(key));
+			}
+		},
+		'delete': function (key) {
+			if ($m) {
+				var result = $mapDelete($m, key);
+				if ($mapSize($m) === 0) {
+					$m = void undefined;
+				}
+				return result;
+			}
+			return false;
+		},
+		get: function (key) { // eslint-disable-line consistent-return
+			if ($m) {
+				return $mapGet($m, key);
+			}
+		},
+		has: function (key) {
+			if ($m) {
+				return $mapHas($m, key);
+			}
+			return false;
+		},
+		set: function (key, value) {
+			if (!$m) {
+				// @ts-expect-error TS can't handle narrowing a variable inside a closure
+				$m = new $Map();
+			}
+			$mapSet($m, key, value);
+		}
+	};
 
-	// prototype primitive
-	t.equal(callBound('Error.prototype.message'), Error.prototype.message, 'Error.prototype.message yields itself');
-	t.equal(callBound('%Error.prototype.message%'), Error.prototype.message, '%Error.prototype.message% yields itself');
-
-	var x = callBound('Object.prototype.toString');
-	var y = callBound('%Object.prototype.toString%');
-
-	// prototype function
-	t.notEqual(x, Object.prototype.toString, 'Object.prototype.toString does not yield itself');
-	t.notEqual(y, Object.prototype.toString, '%Object.prototype.toString% does not yield itself');
-	t.equal(x(true), Object.prototype.toString.call(true), 'call-bound Object.prototype.toString calls into the original');
-	t.equal(y(true), Object.prototype.toString.call(true), 'call-bound %Object.prototype.toString% calls into the original');
-
-	t['throws'](
-		// @ts-expect-error
-		function () { callBound('does not exist'); },
-		SyntaxError,
-		'nonexistent intrinsic throws'
-	);
-	t['throws'](
-		// @ts-expect-error
-		function () { callBound('does not exist', true); },
-		SyntaxError,
-		'allowMissing arg still throws for unknown intrinsic'
-	);
-
-	t.test('real but absent intrinsic', { skip: typeof WeakRef !== 'undefined' }, function (st) {
-		st['throws'](
-			function () { callBound('WeakRef'); },
-			TypeError,
-			'real but absent intrinsic throws'
-		);
-		st.equal(callBound('WeakRef', true), undefined, 'allowMissing arg avoids exception');
-		st.end();
-	});
-
-	t.end();
-});
+	// @ts-expect-error TODO: figure out why TS is erroring here
+	return channel;
+};
