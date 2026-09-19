@@ -1,22 +1,56 @@
-# Changelog
+# Change Log
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [4.0.1]
 
-## [v1.0.1](https://github.com/ljharb/side-channel-map/compare/v1.0.0...v1.0.1) - 2024-12-10
+### Changed
 
-### Commits
+- Fix advisory GHSA-869p-cjfg-cm3x: createSign and createVerify now require
+  that a non empty secret is provided (via opts.secret, opts.privateKey or opts.key)
+  when using HMAC algorithms.
+- Upgrading JWA version to 2.0.1, adressing a compatibility issue for Node >= 25.
 
-- [Deps] update `call-bound` [`6d05aaa`](https://github.com/ljharb/side-channel-map/commit/6d05aaa4ce5f2be4e7825df433d650696f0ba40f)
-- [types] fix generics ordering [`11c0184`](https://github.com/ljharb/side-channel-map/commit/11c0184132ac11fdc16857e12682e148e5e9ee74)
+## [3.2.3]
 
-## v1.0.0 - 2024-12-10
+### Changed
 
-### Commits
+- Fix advisory GHSA-869p-cjfg-cm3x: createSign and createVerify now require
+  that a non empty secret is provided (via opts.secret, opts.privateKey or opts.key)
+  when using HMAC algorithms.
+- Upgrading JWA version to 1.4.2, adressing a compatibility issue for Node >= 25.
 
-- Initial implementation, tests, readme, types [`ad877b4`](https://github.com/ljharb/side-channel-map/commit/ad877b42926d46d63fff76a2bd01d2b4a01959a9)
-- Initial commit [`28f8879`](https://github.com/ljharb/side-channel-map/commit/28f8879c512abe8fcf9b6a4dc7754a0287e5eba4)
-- npm init [`2c9604e`](https://github.com/ljharb/side-channel-map/commit/2c9604e5aa40223e425ea7cea78f8a07697504bd)
-- Only apps should have lockfiles [`5e7ba9c`](https://github.com/ljharb/side-channel-map/commit/5e7ba9cffe3ef42095815adc8ac1255b49bbadf5)
+## [3.0.0]
+
+### Changed
+
+- **BREAKING**: `jwt.verify` now requires an `algorithm` parameter, and
+  `jws.createVerify` requires an `algorithm` option. The `"alg"` field
+  signature headers is ignored. This mitigates a critical security flaw
+  in the library which would allow an attacker to generate signatures with
+  arbitrary contents that would be accepted by `jwt.verify`. See
+  https://auth0.com/blog/2015/03/31/critical-vulnerabilities-in-json-web-token-libraries/
+  for details.
+
+## [2.0.0] - 2015-01-30
+
+### Changed
+
+- **BREAKING**: Default payload encoding changed from `binary` to
+  `utf8`. `utf8` is a is a more sensible default than `binary` because
+  many payloads, as far as I can tell, will contain user-facing
+  strings that could be in any language. (<code>[6b6de48]</code>)
+
+- Code reorganization, thanks [@fearphage]! (<code>[7880050]</code>)
+
+### Added
+
+- Option in all relevant methods for `encoding`. For those few users
+  that might be depending on a `binary` encoding of the messages, this
+  is for them. (<code>[6b6de48]</code>)
+
+[unreleased]: https://github.com/brianloveswords/node-jws/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/brianloveswords/node-jws/compare/v1.0.1...v2.0.0
+[7880050]: https://github.com/brianloveswords/node-jws/commit/7880050
+[6b6de48]: https://github.com/brianloveswords/node-jws/commit/6b6de48
+[@fearphage]: https://github.com/fearphage

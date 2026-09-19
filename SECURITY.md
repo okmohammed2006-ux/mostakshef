@@ -1,25 +1,11 @@
-# Security Policies and Procedures
+# Security issue reporting & disclosure process
 
-## Reporting a Bug
+Please reach out if you think you've found a security issue.
 
-The `cookie` team and community take all security bugs seriously. Thank
-you for improving the security of the project. We appreciate your efforts and
-responsible disclosure and will make every effort to acknowledge your
-contributions.
+Email Evan Hahn at <me@evanhahn.com>, on Signal at [EvanHahn.64](https://signal.me/#eu/vDide_HmUgHnNa0usMXq8oHAA0gnl5dzCqDeHyXhkeIbIiOcPVhCZKXIZteSqoc8), or [in other ways](https://evanhahn.com/contact).
 
-Report security bugs by emailing the current owner(s) of `cookie`. This
-information can be found in the npm registry using the command
-`npm owner ls cookie`.
-If unsure or unable to get the information from the above, open an issue
-in the [project issue tracker](https://github.com/jshttp/cookie/issues)
-asking for the current contact information.
+My playbook for security issues:
 
-To ensure the timely response to your report, please ensure that the entirety
-of the report is contained within the email body and not solely behind a web
-link or an attachment.
-
-At least one owner will acknowledge your email within 48 hours, and will send a
-more detailed response within 48 hours indicating the next steps in handling
-your report. After the initial reply to your report, the owners will
-endeavor to keep you informed of the progress towards a fix and full
-announcement, and may ask for additional information or guidance.
+- Acknowledge and address the concern as soon as possible
+- Issue advisories (CVEs, for example) as needed. Public disclosure may be embargoed to give people time to update
+- Consider patching non-current major versions depending on popularity and severity
