@@ -1,33 +1,43 @@
-# منصة محمد الفقي التعليمية — Production V8
+# Array Flatten
 
-منصة دراسات اجتماعية عربية مبنية بـ Node.js + Express، مع PostgreSQL على Render، لوحة Admin/Teacher تفاعلية، نظام طلاب واختبارات وتقدم وشهادات وربط YouTube.
+[![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][downloads-url]
+[![Build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
 
-## تشغيل محلي
-1. `npm install`
-2. `npm start`
-3. افتح `http://localhost:3000`
+> Flatten an array of nested arrays into a single flat array. Accepts an optional depth.
 
-إذا لم تضع `DATABASE_URL` سيستخدم المشروع `data/db.json` للتجربة المحلية. عند النشر يجب استخدام PostgreSQL.
+## Installation
 
-## النشر على Render
-أسهل طريقة: ارفع المشروع إلى GitHub ثم في Render اختر **New → Blueprint** واربط المستودع. ملف `render.yaml` ينشئ Web Service وقاعدة PostgreSQL ويربط `DATABASE_URL` تلقائيًا.
+```
+npm install array-flatten --save
+```
 
-أضف `YOUTUBE_API_KEY` من إعدادات الخدمة لتفعيل اختيار فيديوهات قناة محمد الفقي تلقائيًا. لا تضع المفتاح داخل ملفات JavaScript الخاصة بالمتصفح.
+## Usage
 
-### متغيرات البيئة
-- `DATABASE_URL` — ينشئها Render تلقائيًا من قاعدة البيانات.
-- `JWT_SECRET` — Render يولده تلقائيًا عبر `generateValue` في Blueprint.
-- `YOUTUBE_API_KEY` — مفتاح YouTube Data API.
-- `YOUTUBE_HANDLE=@mohamed.alfeki`
-- `YOUTUBE_CHANNEL_URL=https://youtube.com/@mohamed.alfeki`
+```javascript
+var flatten = require('array-flatten')
 
-## الحسابات التجريبية
-- Admin: `admin@mostakshef.local` / `Admin@12345`
-- Teacher: `teacher@mostakshef.local` / `Teacher@12345`
+flatten([1, [2, [3, [4, [5], 6], 7], 8], 9])
+//=> [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-غيّر الحسابات وكلمات المرور قبل الاستخدام العام.
+flatten([1, [2, [3, [4, [5], 6], 7], 8], 9], 2)
+//=> [1, 2, 3, [4, [5], 6], 7, 8, 9]
 
-## ملاحظة قاعدة البيانات
-نسخة الإنتاج تستخدم جدول PostgreSQL واحدًا باسم `app_state` لتخزين حالة المنصة كـJSONB، مع الحفاظ على نفس نموذج البيانات الحالي لتسهيل الانتقال من النسخة التجريبية. البيانات الأولية في `data/db.json` تُستخدم فقط عند إنشاء قاعدة جديدة لأول مرة.
+(function () {
+  flatten(arguments) //=> [1, 2, 3]
+})(1, [2, 3])
+```
 
-Render يوضح أن نظام الملفات الافتراضي للخدمات مؤقت، لذلك لا تعتمد نسخة الإنتاج على `db.json` لتخزين بيانات الطلاب. PostgreSQL هو مخزن البيانات الدائم.
+## License
+
+MIT
+
+[npm-image]: https://img.shields.io/npm/v/array-flatten.svg?style=flat
+[npm-url]: https://npmjs.org/package/array-flatten
+[downloads-image]: https://img.shields.io/npm/dm/array-flatten.svg?style=flat
+[downloads-url]: https://npmjs.org/package/array-flatten
+[travis-image]: https://img.shields.io/travis/blakeembrey/array-flatten.svg?style=flat
+[travis-url]: https://travis-ci.org/blakeembrey/array-flatten
+[coveralls-image]: https://img.shields.io/coveralls/blakeembrey/array-flatten.svg?style=flat
+[coveralls-url]: https://coveralls.io/r/blakeembrey/array-flatten?branch=master
